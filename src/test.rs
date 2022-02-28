@@ -23,6 +23,16 @@ mod tests {
         }
     }
     #[test]
+    fn malloc_doesnt_return_null() {
+    	let raw_ptr: *mut ::std::os::raw::c_void = std::ptr::null_mut();
+    	let mut newptr:*mut c_void = std::ptr::null_mut();
+    	unsafe {
+    		assert_eq!(newptr as usize, 0x0);
+    		newptr = halide_malloc(raw_ptr, 1000);
+    		assert_ne!(newptr as usize, 0x0);
+    		}
+    }
+    #[test]
     fn thread_set(){
         let  a = 5;
         let b = 1;
