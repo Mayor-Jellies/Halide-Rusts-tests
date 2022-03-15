@@ -202,3 +202,27 @@ pub struct halide_buffer_t {
     #[doc = " Pads the buffer up to a multiple of 8 bytes"]
     pub padding: *mut ::std::os::raw::c_void,
 }
+
+
+
+extern "C" {
+    #[doc = " Copy image data from device memory to host memory. This must be called"]
+    #[doc = " explicitly to copy back the results of a GPU-based filter."]
+    pub fn halide_copy_to_host(
+        user_context: *mut ::std::os::raw::c_void,
+        buf: *mut halide_buffer_t,
+    ) -> ::std::os::raw::c_int;
+}
+
+#[doc = "< signed integers"]
+pub const halide_type_code_t_halide_type_int: halide_type_code_t = 0;
+#[doc = "< unsigned integers"]
+pub const halide_type_code_t_halide_type_uint: halide_type_code_t = 1;
+#[doc = "< IEEE floating point numbers"]
+pub const halide_type_code_t_halide_type_float: halide_type_code_t = 2;
+
+#[doc = " Types in the halide type system. They can be ints, unsigned ints,"]
+#[doc = " or floats (of various bit-widths), or a handle (which is always 64-bits)."]
+#[doc = " Note that the int/uint/float values do not imply a specific bit width"]
+#[doc = " (the bit width is expected to be encoded in a separate value)."]
+pub type halide_type_code_t = ::std::os::raw::c_uint;
