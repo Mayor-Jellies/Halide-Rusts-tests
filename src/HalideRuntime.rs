@@ -30,6 +30,52 @@ extern "C" {
     pub fn halide_profiler_report(user_context: *mut ::std::os::raw::c_void);
 }
 extern "C" {
+    #[doc = "Reset profiler state cheaply. May leave threads running or some"]
+    #[doc = " memory allocated but all accumulated statistics are reset."]
+    #[doc = ""]
+    #[doc = "WARNING: Do NOT call this method while any halide pipeline is"]
+    #[doc = "running; halide_profiler_memory_allocate/free and"]
+    #[doc = "halide_profiler_stack_peak_update update the profiler pipeline's"]
+    #[doc = "state without grabbing the global profiler state's lock. "]
+    pub fn halide_profiler_reset();
+}
+extern "C" {
+    #[doc = "If halide_memoization_cache_lookup succeeds,"]
+    #[doc = "halide_memoization_cache_release must be called to signal the"]
+    #[doc = "storage is no longer being used by the caller. "]
+    #[doc = ""]
+    #[doc = "It will be passed to the host pointer of one the buffers returned by"]
+    #[doc = "halide_memoization_cache_lookup. "]
+    #[doc = ""]
+    #[doc = "That is halide_memoization_cache_release will be called multiple times for"]
+    #[doc = "the case where halide_memoization_cache_lookup is handling multiple"]
+    #[doc = "buffers.  (This corresponds to memoizing a Tuple in Halide.) "]
+    #[doc = ""]
+    #[doc = "Note that the host pointer must be sufficient to get to all information"]
+    #[doc = "the release operation needs. "]
+    #[doc = ""]
+    #[doc = "The default Halide cache implementation accomplishes this by storing extra data before the start of the user"]
+    #[doc = "modifiable host storage."]
+    #[doc = ""]
+
+    #[doc = "This call is like free and does not have a failure return."]
+
+    pub fn halide_memoization_cache_release(
+        user_context: *mut ::std::os::raw::c_void,
+        host: *mut ::std::os::raw::c_void,
+    );
+}
+extern "C" {
+    #[doc = "Set the soft maximum amount of memory, in bytes, that the LRU"]
+    #[doc = "cache will use to memoize Func results.  "]
+    #[doc = ""]
+    #[doc = "This is not a strict maximum in that concurrency and simultaneous use of memoized"]
+    #[doc = "results larger than the cache size can both cause it to"]
+    #[doc = "temporarily be larger than the size specified here."]
+
+    pub fn halide_memoization_cache_set_size(size: i64);
+}
+extern "C" {
     #[doc = " Set the file descriptor that Halide should write binary trace"]
     #[doc = " events to. If called with 0 as the argument, Halide outputs trace"]
     #[doc = " information to stdout in a human-readable format. If never called,"]
@@ -41,6 +87,14 @@ extern "C" {
 }
 
 extern "C" {
+    #[doc = "Define halide_do_par_for to replace the default thread pool"]
+    #[doc = "implementation. halide_shutdown_thread_pool can also be called to"]
+    #[doc = "release resources used by the default thread pool on platforms"]
+    #[doc = "where it makes sense. See Func::set_custom_do_task and"]
+    #[doc = "Func::set_custom_do_par_for. Should return zero if all the jobs"]
+    #[doc = "return zero, or an arbitrarily chosen return value from one of the"]
+    #[doc = "jobs otherwise."]
+
     pub fn halide_shutdown_thread_pool();
 }
 
@@ -54,7 +108,7 @@ extern "C" {
 #[doc = " device functions."]
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct halide_device_interface_impl_t {
+pub struct HalideDeviceInterfaceImplT {
     pub(crate) _unused: [u8; 0],
 }
 
@@ -66,7 +120,10 @@ pub struct halide_dimension_t {
     pub stride: i32,
     pub flags: u32,
 }
-
+#[doc = "A runtime tag for a type in the halide type system. Can be ints,"]
+#[doc = "unsigned ints, or floats of various bit-widths the 'bits' field)."]
+#[doc = "(Can also be vectors of the same (by setting the 'lanes' field to something larger than one)."]
+#[doc = " This struct should be exactly 32-bits in size."]
 pub struct halide_type_t {
     pub code: u8,
     #[doc = " The number of bits of precision of a single scalar value of this type."]
@@ -178,7 +235,7 @@ pub struct halide_device_interface_t {
             minor: *mut ::std::os::raw::c_int,
         ) -> ::std::os::raw::c_int,
     >,
-    pub impl_: *const halide_device_interface_impl_t,
+    pub impl_: *const HalideDeviceInterfaceImplT,
 }
 
 pub struct halide_buffer_t {
