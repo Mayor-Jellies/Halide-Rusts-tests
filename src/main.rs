@@ -1,10 +1,12 @@
 #![allow(warnings)]
 
 pub mod HalideRuntime;
+pub mod HalideGenerator;
 
 use std::ffi::c_void;
 use std::ffi::*;
 use std::os::raw::c_int;
+use std::sync::mpsc::channel;
 use crate::HalideRuntime::{halide_malloc, halide_profiler_report};
 use crate::HalideRuntime::halide_free;
 
@@ -20,7 +22,8 @@ use crate::HalideRuntime::halide_type_code_t_halide_type_float;
 
 use image::io::Reader;
 use image::save_buffer_with_format;
-    
+use crate::HalideGenerator::iir_blur;
+
 include!("test.rs");
 
 fn main(){
@@ -31,9 +34,12 @@ fn main(){
     let (width, height) = (img.width(), img.height());
     let img_byte_vec = img.into_raw();
     
-    let buf = halide_buffer(width as i32, height as i32, 10, Type::new(Kind::UInt, 8) , img_byte_vec.as_ptr() as *mut u8);
-    
-    save_buffer_with_format("myimg.jpg", &img_byte_vec, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
+    let inbuf = halide_buffer(width as i32, height as i32, 10, Type::new(Kind::UInt, 8) , img_byte_vec.as_ptr() as *mut u8);
+    let outbuf =halide_buffer(width as i32,height as i32, 10, Type::new(Kind::UInt, 8),img_byte_vec.as_ptr() as *mut u8);
+    unsafe {
+         iir_blur(inbuf, 0.5, outbuf);
+    }
+save_buffer_with_format("myimg.jpg", &img_byte_vec, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -49,14 +49,14 @@ mod tests {
         }
     }
     #[test]
-    fn test_shutdwon_thread_pool(){
+    fn test_shutdown_thread_pool(){
         unsafe{
             halide_shutdown_thread_pool();
         }
     }
 
     #[test]
-    fn test_shutdwon_trace_file(){
+    fn test_shutdown_trace_file(){
         unsafe{
             halide_shutdown_trace();
         }
@@ -142,7 +142,6 @@ mod tests {
         unsafe {
             halide_memoization_cache_set_size(0)
         }
-
 
     }
 
