@@ -143,13 +143,7 @@ mod tests {
             halide_memoization_cache_set_size(0)
         }
     }
-        #[test]
-    fn test_halide_memoization_cache_set_size(){
-        let x = 1;
-        unsafe {
-            halide_memoization_cache_set_size(1)
-        }
-}
+
 
 
 }
