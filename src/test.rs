@@ -127,12 +127,12 @@ mod tests {
 
     #[test]
     fn test_halide_memoization_cache_release(){
-        let x = std::ptr::null_mut();
+        //let x = std::ptr::null_mut();
         let raw_ptr: *mut ::std::os::raw::c_void = std::ptr::null_mut();
 
-
+        assert_eq!(2,3);
         unsafe {
-            halide_memoization_cache_release(x, raw_ptr)
+            //halide_memoization_cache_release(x, raw_ptr)
         }
     }
 
