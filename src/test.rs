@@ -49,14 +49,14 @@ mod tests {
         }
     }
     #[test]
-    fn test_shutdwon_thread_pool(){
+    fn test_shutdown_thread_pool(){
         unsafe{
             halide_shutdown_thread_pool();
         }
     }
 
     #[test]
-    fn test_shutdwon_trace_file(){
+    fn test_shutdown_trace_file(){
         unsafe{
             halide_shutdown_trace();
         }
@@ -127,12 +127,12 @@ mod tests {
 /*
     #[test]
     fn test_halide_memoization_cache_release(){
-        let x = std::ptr::null_mut();
+        //let x = std::ptr::null_mut();
         let raw_ptr: *mut ::std::os::raw::c_void = std::ptr::null_mut();
 
-
+        assert_eq!(2,3);
         unsafe {
-            halide_memoization_cache_release(x, raw_ptr)
+            //halide_memoization_cache_release(x, raw_ptr)
         }
     }
 */
@@ -143,6 +143,7 @@ mod tests {
         unsafe {
             halide_memoization_cache_set_size(0)
         }
+
     }
 
 }
