@@ -124,6 +124,8 @@ pub struct halide_dimension_t {
 #[doc = "unsigned ints, or floats of various bit-widths the 'bits' field)."]
 #[doc = "(Can also be vectors of the same (by setting the 'lanes' field to something larger than one)."]
 #[doc = " This struct should be exactly 32-bits in size."]
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct halide_type_t {
     pub code: u8,
     #[doc = " The number of bits of precision of a single scalar value of this type."]
@@ -131,7 +133,8 @@ pub struct halide_type_t {
     #[doc = " How many elements in a vector. This is 1 for scalar types."]
     pub lanes: u16,
 }
-
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct halide_device_interface_t {
     pub device_malloc: ::std::option::Option<
         unsafe extern "C" fn(
@@ -238,6 +241,8 @@ pub struct halide_device_interface_t {
     pub impl_: *const HalideDeviceInterfaceImplT,
 }
 
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct halide_buffer_t {
     #[doc = " A device-handle for e.g. GPU memory used to back this buffer."]
     pub device: u64,

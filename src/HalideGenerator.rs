@@ -1,10 +1,11 @@
 use crate::halide_buffer_t;
 
 #[link(name="iir_blur", kind="static")]
+
 extern "C" {
     pub fn iir_blur(
-        src: halide_buffer_t,
-        float: f32,
-        dst: halide_buffer_t,
-    );
+        in_buf: *mut halide_buffer_t,
+        alpha: f32,
+        out_buf: *mut halide_buffer_t,
+    ) -> ::std::os::raw::c_int;
 }
