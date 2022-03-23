@@ -109,7 +109,6 @@ mod tests {
             };
         }
     }
-
     #[test]
     fn test_Profiler_report(){
         let x= std::ptr::null_mut();
@@ -125,6 +124,7 @@ mod tests {
         }
     }
 
+/*
     #[test]
     fn test_halide_memoization_cache_release(){
         //let x = std::ptr::null_mut();
@@ -135,6 +135,7 @@ mod tests {
             //halide_memoization_cache_release(x, raw_ptr)
         }
     }
+*/
 
     #[test]
     fn test_halide_memoization_cache_set_size(){
