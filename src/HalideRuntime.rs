@@ -251,7 +251,7 @@ pub struct halide_buffer_t {
     #[doc = " A pointer to the start of the data in main memory. In terms of"]
     #[doc = " the Halide coordinate system, this is the address of the min"]
     #[doc = " coordinates (defined below)."]
-    pub host: *mut u8,
+    pub host: *mut f32,
     #[doc = " flags with various meanings."]
     pub flags: u64,
     #[doc = " The type of each buffer element."]

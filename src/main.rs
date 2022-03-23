@@ -30,25 +30,29 @@ fn main(){
 
     println!("halide mainish thing");
     
-    let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb8();
-    let img2 = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb8();
+    let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb32f();
+    let img2 = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb32f();
 
     let (width, height) = (img.width(), img.height());
-    let img_byte_vec = img.into_raw();
-    let img_byte_vec2 : Vec<u8> = img2.into_raw();
+    let mut img_byte_vec = img.into_raw();
+    let mut img_byte_vec2: Vec<f32> = vec![0.0; ((width as i32 )* (height as i32) ) as usize];
     
-    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 3, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec.as_ptr() as *mut u8);
+    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec.as_mut_ptr());
     println!("{:?}",img_byte_vec.as_ptr() );
-    let mut outbuf:  halide_buffer_t = halide_buffer(width as i32,height as i32, 3, halide_type_t{bits: 32,code: 2,lanes: 1},img_byte_vec2.as_ptr() as *mut u8);
+    let mut outbuf:  halide_buffer_t = halide_buffer(width as i32,height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec2.as_mut_ptr());
 
     println!("{:?}",img_byte_vec2.as_ptr() );
 
-    //println!("{:?}",outbuf.dimensions);
 
     unsafe {
-         iir_blur(&mut inbuf , 0.5, &mut outbuf);
+         iir_blur(&mut inbuf , 10000.0, &mut outbuf);
     }
-save_buffer_with_format("myimg.jpg", &img_byte_vec, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
+
+   // for i in 0.. img_byte_vec.len()-1{
+     //   assert_ne!(img_byte_vec[i],img_byte_vec2[i],"{}",i);
+    //}
+    //save
+//save_buffer_with_format("myimg.png", &img_byte_vec2, width, height, image::ColorType::Rgb32F, image::ImageFormat::Png).unwrap();
 }
 
 
@@ -57,7 +61,7 @@ fn halide_buffer(
     height: i32,
     channels: i32,
     t: halide_type_t,
-    data: *mut u8,
+    data: *mut f32,
 ) -> halide_buffer_t {
 
 
@@ -92,7 +96,7 @@ fn halide_buffer(
     let buf = halide_buffer_t {
         device: 0,
         device_interface: std::ptr::null(),
-        dimensions: if channels < 2 { 2 } else { 3 },
+        dimensions: 3,
         host: data,
         flags: 0,
         padding: std::ptr::null_mut(),
