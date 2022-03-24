@@ -35,24 +35,51 @@ fn main(){
 
     let (width, height) = (img.width(), img.height());
     let mut img_byte_vec = img.into_raw();
-    let mut img_byte_vec2: Vec<f32> = vec![0.0; ((width as i32 )* (height as i32) ) as usize];
+    let mut img_byte_vec2: Vec<f32> = vec![0.0; ((width as i32 )* (height as i32) * 3) as usize];
     
-    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec.as_mut_ptr());
-    println!("{:?}",img_byte_vec.as_ptr() );
-    let mut outbuf:  halide_buffer_t = halide_buffer(width as i32,height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec2.as_mut_ptr());
+    
 
-    println!("{:?}",img_byte_vec2.as_ptr() );
+    
+    println!("{}", img_byte_vec[1000]);
+    println!("{}", img_byte_vec2[1000]);
+    
+    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec.as_mut_ptr(), 1);
+
+    let mut outbuf:  halide_buffer_t = halide_buffer(width as i32,height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec2.as_mut_ptr(), 0);
 
 
+
+
+	// Trying to make smaller vectors to test with
+    /*
+    let mut testvec = vec![1.0f32,2.0,3.0];
+    let mut testvec2 = vec![0.0; 3 as usize];
+    
+	let mut testin: halide_buffer_t = halide_buffer(3 as i32, 1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec.as_mut_ptr());
+    //println!("{:?}",img_byte_vec.as_ptr() );
+	let mut testout:  halide_buffer_t = halide_buffer(3 as i32,1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec2.as_mut_ptr());
+    */
+    
+    
     unsafe {
-         iir_blur(&mut inbuf , 10000.0, &mut outbuf);
+         iir_blur(&mut inbuf , 0.5, &mut outbuf);
     }
 
+    println!("{}", img_byte_vec[1000]);
+    println!("{}", img_byte_vec2[1000]);
    // for i in 0.. img_byte_vec.len()-1{
      //   assert_ne!(img_byte_vec[i],img_byte_vec2[i],"{}",i);
     //}
     //save
-//save_buffer_with_format("myimg.png", &img_byte_vec2, width, height, image::ColorType::Rgb32F, image::ImageFormat::Png).unwrap();
+    
+    
+	let buf2 = unsafe{std::slice::from_raw_parts(img_byte_vec.as_ptr() as *const u8, img_byte_vec.len() * 4)};
+
+	save_buffer_with_format("myimg.jpg", buf2, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
+	
+	//save_buffer_with_format("myimg.png", &img, width, height, image::ColorType::Rgb32F, image::ImageFormat::Png).unwrap();
+	
+	//newimg.save("myimg.png", image::ImageFormat::Png).unwrap();
 }
 
 
@@ -62,6 +89,7 @@ fn halide_buffer(
     channels: i32,
     t: halide_type_t,
     data: *mut f32,
+    flags: u64,
 ) -> halide_buffer_t {
 
 
@@ -82,15 +110,13 @@ fn halide_buffer(
         stride: channels * width,
     });
 
-    if channels > 1 {
-        dim.push(halide_dimension_t {
-            flags: 0,
-            min: 0,
-            extent: channels,
-            stride: 1,
-        });
-    }
-
+	dim.push(halide_dimension_t {
+	    flags: 0,
+	    min: 0,
+	    extent: 4,
+	    stride: channels * width * height,
+	});
+    
     dim.shrink_to_fit();
 
     let buf = halide_buffer_t {
@@ -98,7 +124,7 @@ fn halide_buffer(
         device_interface: std::ptr::null(),
         dimensions: 3,
         host: data,
-        flags: 0,
+        flags: flags,
         padding: std::ptr::null_mut(),
         type_: t,
         dim: dim.as_mut_ptr(),
