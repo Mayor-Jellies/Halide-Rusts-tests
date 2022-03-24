@@ -30,8 +30,9 @@ fn main(){
 
     println!("halide mainish thing");
     
-    let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb32f();
-    let img2 = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb32f();
+    let img = Reader::open("catSmol.jpg").unwrap().decode().unwrap().to_rgb32f();
+    
+      //  let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb32f();
 
     let (width, height) = (img.width(), img.height());
     let mut img_byte_vec = img.into_raw();
@@ -54,15 +55,15 @@ fn main(){
     /*
     let mut testvec = vec![1.0f32,2.0,3.0];
     let mut testvec2 = vec![0.0; 3 as usize];
-    
-	let mut testin: halide_buffer_t = halide_buffer(3 as i32, 1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec.as_mut_ptr());
-    //println!("{:?}",img_byte_vec.as_ptr() );
-	let mut testout:  halide_buffer_t = halide_buffer(3 as i32,1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec2.as_mut_ptr());
     */
+	//let mut testin: halide_buffer_t = halide_buffer(3 as i32, 1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec.as_mut_ptr());
+    //println!("{:?}",img_byte_vec.as_ptr() );
+	//let mut testout:  halide_buffer_t = halide_buffer(3 as i32,1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec2.as_mut_ptr());
+    
     
     
     unsafe {
-         iir_blur(&mut inbuf , 0.5, &mut outbuf);
+         iir_blur(&mut inbuf, 0.5, &mut outbuf);
     }
 
     println!("{}", img_byte_vec[1000]);
@@ -73,9 +74,9 @@ fn main(){
     //save
     
     
-	let buf2 = unsafe{std::slice::from_raw_parts(img_byte_vec.as_ptr() as *const u8, img_byte_vec.len() * 4)};
+	//let buf2 = unsafe{std::slice::from_raw_parts(img_byte_vec2.as_ptr() as *const u8, img_byte_vec2.len() * 10)};
 
-	save_buffer_with_format("myimg.jpg", buf2, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
+	//save_buffer_with_format("myimg.jpg", buf2, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
 	
 	//save_buffer_with_format("myimg.png", &img, width, height, image::ColorType::Rgb32F, image::ImageFormat::Png).unwrap();
 	
@@ -113,7 +114,7 @@ fn halide_buffer(
 	dim.push(halide_dimension_t {
 	    flags: 0,
 	    min: 0,
-	    extent: 4,
+	    extent: 3,
 	    stride: channels * width * height,
 	});
     
