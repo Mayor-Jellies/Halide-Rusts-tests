@@ -30,21 +30,31 @@ fn main(){
 
     println!("halide mainish thing");
     
-    let img = Reader::open("catSmol.jpg").unwrap().decode().unwrap().to_rgb32f();
+    let img = Reader::open("catSmol.jpg").unwrap().decode().unwrap().to_rgb8();
     
       //  let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb32f();
 
     let (width, height) = (img.width(), img.height());
     let mut img_byte_vec = img.into_raw();
+
+    let mut input: Vec<f32> = vec![0.0;img_byte_vec.len()];
+    for x in 0..img_byte_vec.len(){
+        input[x] = img_byte_vec[x] as f32;
+    }
+
+
+
+
     let mut img_byte_vec2: Vec<f32> = vec![0.0; ((width as i32 )* (height as i32) * 3) as usize];
-    
+
+
     
 
     
     println!("{}", img_byte_vec[1000]);
     println!("{}", img_byte_vec2[1000]);
     
-    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec.as_mut_ptr(), 1);
+    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, input.as_mut_ptr(), 1);
 
     let mut outbuf:  halide_buffer_t = halide_buffer(width as i32,height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec2.as_mut_ptr(), 0);
 
@@ -72,11 +82,14 @@ fn main(){
      //   assert_ne!(img_byte_vec[i],img_byte_vec2[i],"{}",i);
     //}
     //save
-    
-    
-	//let buf2 = unsafe{std::slice::from_raw_parts(img_byte_vec2.as_ptr() as *const u8, img_byte_vec2.len() * 10)};
+    let mut output: Vec<u8> = vec![0;img_byte_vec2.len()];
+    for x in 0..img_byte_vec2.len(){
+        output[x] = img_byte_vec2[x] as u8;
+    }
 
-	//save_buffer_with_format("myimg.jpg", buf2, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
+	//let output: Vec<u8> =
+
+	save_buffer_with_format("myimg.jpg", &output, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
 	
 	//save_buffer_with_format("myimg.png", &img, width, height, image::ColorType::Rgb32F, image::ImageFormat::Png).unwrap();
 	
