@@ -30,9 +30,9 @@ fn main(){
 
     println!("halide mainish thing");
     
-    let img = Reader::open("catSmol.jpg").unwrap().decode().unwrap().to_rgb8();
+    let img = Reader::open("catSmol.jpg").unwrap().decode().unwrap().to_rgba8();
     
-      //  let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgb32f();
+       //let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgba8();
 
     let (width, height) = (img.width(), img.height());
     let mut img_byte_vec = img.into_raw();
@@ -43,57 +43,35 @@ fn main(){
     }
 
 
-
-
-    let mut img_byte_vec2: Vec<f32> = vec![0.0; ((width as i32 )* (height as i32) * 3) as usize];
+    let mut img_byte_vec2: Vec<f32> = vec![0.0; ((width as i32 )* (height as i32) * 4) as usize];    
 
 
     
+    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 4 as i32, halide_type_t{bits: 32,code: 2,lanes: 1}, input.as_mut_ptr(), 1);
 
-    
-    println!("{}", img_byte_vec[1000]);
-    println!("{}", img_byte_vec2[1000]);
-    
-    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, input.as_mut_ptr(), 1);
-
-    let mut outbuf:  halide_buffer_t = halide_buffer(width as i32,height as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec2.as_mut_ptr(), 0);
+    let mut outbuf:halide_buffer_t = halide_buffer(width as i32, height as i32, 4 as i32, halide_type_t{bits: 32,code: 2,lanes: 1}, img_byte_vec2.as_mut_ptr(), 0);
 
 
 
+	let mut output: Vec<u8> = vec![0;input.len()];
+	for x in 0..input.len(){
+	    output[x] = input[x] as u8;
+	}
 
-	// Trying to make smaller vectors to test with
-    /*
-    let mut testvec = vec![1.0f32,2.0,3.0];
-    let mut testvec2 = vec![0.0; 3 as usize];
-    */
-	//let mut testin: halide_buffer_t = halide_buffer(3 as i32, 1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec.as_mut_ptr());
-    //println!("{:?}",img_byte_vec.as_ptr() );
-	//let mut testout:  halide_buffer_t = halide_buffer(3 as i32,1 as i32, 1, halide_type_t{bits: 32,code: 2,lanes: 1}, testvec2.as_mut_ptr());
-    
     
     
     unsafe {
-         iir_blur(&mut inbuf, 0.5, &mut outbuf);
+        iir_blur(&mut inbuf, 0.1, &mut outbuf);
     }
 
-    println!("{}", img_byte_vec[1000]);
-    println!("{}", img_byte_vec2[1000]);
-   // for i in 0.. img_byte_vec.len()-1{
-     //   assert_ne!(img_byte_vec[i],img_byte_vec2[i],"{}",i);
-    //}
     //save
-    let mut output: Vec<u8> = vec![0;img_byte_vec2.len()];
-    for x in 0..img_byte_vec2.len(){
+    let mut output: Vec<u8> = vec![0;output.len()];
+    for x in 0..output.len(){
         output[x] = img_byte_vec2[x] as u8;
     }
 
-	//let output: Vec<u8> =
+	image::save_buffer("outBlurred.png", &output, width, height, image::ColorType::Rgba8);
 
-	save_buffer_with_format("myimg.jpg", &output, width, height, image::ColorType::Rgb8, image::ImageFormat::Jpeg).unwrap();
-	
-	//save_buffer_with_format("myimg.png", &img, width, height, image::ColorType::Rgb32F, image::ImageFormat::Png).unwrap();
-	
-	//newimg.save("myimg.png", image::ImageFormat::Png).unwrap();
 }
 
 
@@ -110,28 +88,28 @@ fn halide_buffer(
     let mut dim = Vec::new();
 
     dim.push(halide_dimension_t {
-        flags: 0,
+        flags: flags as u32,
         min: 0,
         extent: width,
         stride: channels,
     });
 
     dim.push(halide_dimension_t {
-        flags: 0,
+        flags: flags as u32,
         min: 0,
         extent: height,
-        //stride: channels,
-        stride: channels * width,
+        stride: width * channels,
     });
 
-	dim.push(halide_dimension_t {
-	    flags: 0,
-	    min: 0,
-	    extent: 3,
-	    stride: channels * width * height,
-	});
-    
-    dim.shrink_to_fit();
+    dim.push(halide_dimension_t {
+        flags: flags as u32,
+        min: 0,
+        extent: channels,
+        stride:  1,
+    });
+
+
+    //dim.shrink_to_fit();
 
     let buf = halide_buffer_t {
         device: 0,
