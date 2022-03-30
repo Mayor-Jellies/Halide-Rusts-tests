@@ -64,7 +64,7 @@ mod tests {
 
     #[test]
     fn test_buff_t(){
-        let host: u8  =u8::MAX;
+        let host: *mut f32  = f32::min as *mut f32;
         let IMPL = HalideDeviceInterfaceImplT { _unused: [] };
         let dev_int:halide_device_interface_t = halide_device_interface_t {
             device_malloc: None,
@@ -100,7 +100,7 @@ mod tests {
             let t = halide_buffer_t {
                 device: 0,
                 device_interface: (&dev_int as *const halide_device_interface_t),
-                host: (host as *mut u8),
+                host: host,
                 flags: 0,
                 type_: H_type_t,
                 dimensions: 0,
