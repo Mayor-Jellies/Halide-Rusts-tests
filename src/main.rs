@@ -22,7 +22,7 @@ fn main(){
 
     println!("halide mainish thing");
     
-    let img = Reader::open("cat.png").unwrap().decode().unwrap().to_rgba8();
+    let img = Reader::open("images/cat.png").unwrap().decode().unwrap().to_rgba8();
 
     let height = img.height();
     let width = img.width();
@@ -52,7 +52,7 @@ fn main(){
         output[x] = output_raw[x] as u8;
     }
 
-	image::save_buffer("outBlurred.png", &output, width, height, image::ColorType::Rgba8);
+	image::save_buffer("images/outBlurred.png", &output, width, height, image::ColorType::Rgba8);
 
 }
 
