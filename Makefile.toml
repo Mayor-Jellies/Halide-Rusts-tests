@@ -1,0 +1,12 @@
+[tasks.my_task]
+
+script = [
+"cd generatorStuff",
+"mkdir host",
+"g++ -O3 -std=c++17 -I /home/jacob/Desktop/Halide/distrib/include/ -I /home/jacob/Desktop/Halide/distrib/tools/  -Wall -Werror -Wno-unused-function -Wcast-qual -Wignored-qualifiers -Wno-comment -Wsign-compare -Wno-unknown-warning-option -Wno-psabi -g iir_blur_generator.cpp /home/jacob/Desktop/Halide/distrib/tools/GenGen.cpp -o host/iir_blur.generator -Wl,-rpath,/home/jacob/Desktop/Halide/distrib/lib/ -L /home/jacob/Desktop/Halide/distrib/lib/ -lHalide -ldl -lpthread -lz -Wl,--no-as-needed -lautoschedule_mullapudi2016 -Wl,--as-needed",
+"host/iir_blur.generator -g iir_blur -f iir_blur -o host target=host-no_runtime-debug auto_schedule=false",
+"host/iir_blur.generator -r runtime -o host target=host",
+"cd host",
+"mv \"iir_blur.a\" ../../\"libiir_blur.a\"",
+"mv \"runtime.a\" ../../\"libruntime.a\""
+]

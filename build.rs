@@ -8,6 +8,7 @@ fn main() {
 
     let Halide_path = Path::new("/Halide");
 
+/*
     cc::Build::new()
         .cpp(true)
         .cargo_metadata(false)
@@ -26,7 +27,7 @@ fn main() {
         .file("/home/rootbutcher2/CLionProjects/Halide-Rusts-tests/Halide/apps/iir_blur/iir_blur_generator.cpp")
         .out_dir("/home/rootbutcher2/CLionProjects/Halide-Rusts-tests")
         .compile("iir_blur_test.generator");
-
+*/
     //RUSTFLAGS="-Z sanitizer=address";
     let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     println!("cargo:rustc-link-search=native={}", Path::new(&dir).display());
