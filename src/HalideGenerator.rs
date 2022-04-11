@@ -1,6 +1,6 @@
 use crate::halide_buffer_t;
 
-#[link(name="iir_blur", kind="static")]
+#[link(name = "iir_blur", kind = "static")]
 extern "C" {
     pub fn iir_blur(
         in_buf: *mut halide_buffer_t,

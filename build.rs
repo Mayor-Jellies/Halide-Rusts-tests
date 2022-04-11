@@ -1,45 +1,37 @@
 //extern crate bindgen;generatorStuffgeneratorStuff
 
-
 use std::env;
 use std::path::Path;
 use std::process::Command;
+use std::io;
+use std::io::prelude::*;
 
 fn main() {
 
-    let Halide_path = Path::new("/home/jacob/Desktop/Halide");
-    
-    
-    Command::new("mkdir")
-            .arg("generatorStuff/host")
-            .spawn()
-            .expect("mkdir failed to execute process"); 
+    //let Halide_path = Path::new("/home/rootbutcher2/CLionProjects/Halide-Rusts-tests/Halide");
 
+    let output = Command::new("g++")
+        .arg("-O3")
+		.arg("-std=c++17")
+		.arg("-I /home/rootbutcher2/CLionProjects/Halide-Rusts-tests/Halide/distrib/include/")
+		.arg("-I /home/rootbutcher2/CLionProjects/Halide-Rusts-tests/Halide/distrib/tools/")
+		.arg("-g /home/rootbutcher2/CLionProjects/Halide-Rusts-tests/iir_blur_generator.cpp /home/rootbutcher2/CLionProjects/Halide-Rusts-tests/Halide/distrib/tools/GenGen.cpp")
+		.arg("-o iir_blur_command.generator")
+		.arg("-Wl,-rpath,/home/rootbutcher2/CLionProjects/Halide-Rusts-tests/Halide/distrib/lib/")
+		.arg("-L /home/rootbutcher2/CLionProjects/Halide-Rusts-tests/Halide/distrib/lib/")
+		.arg("-lHalide")
+		.arg("-ldl")
+		.arg("-lpthread")
+		.arg("-lz")
+		.arg("-lautoschedule_mullapudi2016")
+		.output()
+		.expect("Building the gererator failed");
 
+	println!("status: {}", output.status);
+	io::stdout().write_all(&output.stdout).unwrap();
+	io::stderr().write_all(&output.stderr).unwrap();
 
-    Command::new("g++")
-            .args([
-            	//"-O3",
-            	//"-std=c++17",
-            	"-I /home/jacob/Desktop/Halide/distrib/include/",
-		"-I /home/jacob/Desktop/Halide/distrib/tools/",
-		"-g generatorStuff/iir_blur_generator.cpp /home/jacob/Desktop/Halide/distrib/tools/GenGen.cpp",
-		"-o generatorStuff/host/iir_blur.generator",
-		"-Wl,-rpath,/home/jacob/Desktop/Halide/distrib/lib/",
-		"-L /home/jacob/Desktop/Halide/distrib/lib/",
-		"-lHalide",
-		"-ldl",
-		"-lpthread",
-		"-lz",
-		"-lautoschedule_mullapudi2016"
-		])
-            .spawn()
-            .expect("Building the gererator failed"); 
-
-    Command::new("mkdir")
-            .arg("generatorStuff/host2")
-            .spawn()
-            .expect("mkdir failed to execute process"); 
+	assert!(output.status.success());
 
 /*
     cc::Build::new()
@@ -63,7 +55,10 @@ fn main() {
 */
     //RUSTFLAGS="-Z sanitizer=address";
     let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    println!("cargo:rustc-link-search=native={}", Path::new(&dir).display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        Path::new(&dir).display()
+    );
 }
 /*
 system(c lib)

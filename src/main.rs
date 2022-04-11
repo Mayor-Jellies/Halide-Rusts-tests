@@ -9,7 +9,7 @@ use std::os::raw::c_int;
 use std::sync::mpsc::channel;
 
 use crate::HalideRuntime::*;
-use crate::HalideGenerator::iir_blur;
+//use crate::HalideGenerator::iir_blur;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 use image::io::Reader;
@@ -21,8 +21,12 @@ include!("test.rs");
 fn main(){
 
     println!("halide mainish thing");
-    
-    let img = Reader::open("images/cat.png").unwrap().decode().unwrap().to_rgba8();
+
+    let img = Reader::open("images/cat.png")
+        .unwrap()
+        .decode()
+        .unwrap()
+        .to_rgba8();
 
     let height = img.height();
     let width = img.width();
@@ -30,16 +34,37 @@ fn main(){
 
     let mut img_raw = img.into_raw();
 
-    let mut input: Vec<f32> = vec![0.0;img_raw.len()];
-    for x in 0..img_raw.len(){
+    let mut input: Vec<f32> = vec![0.0; img_raw.len()];
+    for x in 0..img_raw.len() {
         input[x] = img_raw[x] as f32;
     }
 
     let mut output_raw: Vec<f32> = vec![0.0; img_raw.len()];
 
-    
-    let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, channels as i32, halide_type_t{bits: 32,code: 2,lanes: 1}, input.as_mut_ptr(), 1);
-    let mut outbuf:halide_buffer_t = halide_buffer(width as i32, height as i32, channels as i32, halide_type_t{bits: 32,code: 2,lanes: 1}, output_raw.as_mut_ptr(), 0);
+    let mut inbuf: halide_buffer_t = halide_buffer(
+        width as i32,
+        height as i32,
+        channels as i32,
+        halide_type_t {
+            bits: 32,
+            code: 2,
+            lanes: 1,
+        },
+        input.as_mut_ptr(),
+        1,
+    );
+    let mut outbuf: halide_buffer_t = halide_buffer(
+        width as i32,
+        height as i32,
+        channels as i32,
+        halide_type_t {
+            bits: 32,
+            code: 2,
+            lanes: 1,
+        },
+        output_raw.as_mut_ptr(),
+        0,
+    );
 
     unsafe {
         iir_blur(&mut inbuf, 0.1, &mut outbuf);
@@ -47,13 +72,18 @@ fn main(){
 
     //save
 
-    let mut output: Vec<u8> = vec![0;output_raw.len()];
-    for x in 0..output_raw.len(){
+    let mut output: Vec<u8> = vec![0; output_raw.len()];
+    for x in 0..output_raw.len() {
         output[x] = output_raw[x] as u8;
     }
 
-	image::save_buffer("images/outBlurred.png", &output, width, height, image::ColorType::Rgba8);
-
+    image::save_buffer(
+        "images/outBlurred.png",
+        &output,
+        width,
+        height,
+        image::ColorType::Rgba8,
+    );
 }
 
 
@@ -87,7 +117,7 @@ fn halide_buffer(
         flags: flags as u32,
         min: 0,
         extent: channels,
-        stride:  1,
+        stride: 1,
     });
 
 
@@ -108,3 +138,4 @@ fn halide_buffer(
 
     buf
 }
+

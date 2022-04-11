@@ -1,4 +1,4 @@
-#[link(name="runtime", kind="static")]
+#[link(name = "runtime", kind = "static")]
 extern "C" {
     pub fn halide_malloc(
         user_context: *mut ::std::os::raw::c_void,
@@ -57,9 +57,7 @@ extern "C" {
     #[doc = "The default Halide cache implementation accomplishes this by storing extra data before the start of the user"]
     #[doc = "modifiable host storage."]
     #[doc = ""]
-
     #[doc = "This call is like free and does not have a failure return."]
-
     pub fn halide_memoization_cache_release(
         user_context: *mut ::std::os::raw::c_void,
         host: *mut ::std::os::raw::c_void,
@@ -72,7 +70,6 @@ extern "C" {
     #[doc = "This is not a strict maximum in that concurrency and simultaneous use of memoized"]
     #[doc = "results larger than the cache size can both cause it to"]
     #[doc = "temporarily be larger than the size specified here."]
-
     pub fn halide_memoization_cache_set_size(size: i64);
 }
 extern "C" {
@@ -94,7 +91,6 @@ extern "C" {
     #[doc = "Func::set_custom_do_par_for. Should return zero if all the jobs"]
     #[doc = "return zero, or an arbitrarily chosen return value from one of the"]
     #[doc = "jobs otherwise."]
-
     pub fn halide_shutdown_thread_pool();
 }
 
@@ -264,8 +260,6 @@ pub struct halide_buffer_t {
     #[doc = " Pads the buffer up to a multiple of 8 bytes"]
     pub padding: *mut ::std::os::raw::c_void,
 }
-
-
 
 extern "C" {
     #[doc = " Copy image data from device memory to host memory. This must be called"]
