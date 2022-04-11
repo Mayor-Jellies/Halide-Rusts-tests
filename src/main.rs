@@ -9,7 +9,7 @@ use std::os::raw::c_int;
 use std::sync::mpsc::channel;
 
 use crate::HalideRuntime::*;
-//use crate::HalideGenerator::iir_blur;
+use crate::HalideGenerator::iir_blur;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 use image::io::Reader;
