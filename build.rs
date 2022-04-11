@@ -1,12 +1,45 @@
-//extern crate bindgen;
+//extern crate bindgen;generatorStuffgeneratorStuff
 
 
 use std::env;
 use std::path::Path;
+use std::process::Command;
 
 fn main() {
 
-    let Halide_path = Path::new("/Halide");
+    let Halide_path = Path::new("/home/jacob/Desktop/Halide");
+    
+    
+    Command::new("mkdir")
+            .arg("generatorStuff/host")
+            .spawn()
+            .expect("mkdir failed to execute process"); 
+
+
+
+    Command::new("g++")
+            .args([
+            	//"-O3",
+            	//"-std=c++17",
+            	"-I /home/jacob/Desktop/Halide/distrib/include/",
+		"-I /home/jacob/Desktop/Halide/distrib/tools/",
+		"-g generatorStuff/iir_blur_generator.cpp /home/jacob/Desktop/Halide/distrib/tools/GenGen.cpp",
+		"-o generatorStuff/host/iir_blur.generator",
+		"-Wl,-rpath,/home/jacob/Desktop/Halide/distrib/lib/",
+		"-L /home/jacob/Desktop/Halide/distrib/lib/",
+		"-lHalide",
+		"-ldl",
+		"-lpthread",
+		"-lz",
+		"-lautoschedule_mullapudi2016"
+		])
+            .spawn()
+            .expect("Building the gererator failed"); 
+
+    Command::new("mkdir")
+            .arg("generatorStuff/host2")
+            .spawn()
+            .expect("mkdir failed to execute process"); 
 
 /*
     cc::Build::new()

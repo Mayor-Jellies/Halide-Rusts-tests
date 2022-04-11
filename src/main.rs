@@ -9,7 +9,7 @@ use std::os::raw::c_int;
 use std::sync::mpsc::channel;
 
 use crate::HalideRuntime::*;
-//use crate::HalideGenerator::iir_blur;
+use crate::HalideGenerator::iir_blur;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 use image::io::Reader;
@@ -37,12 +37,12 @@ fn main(){
 
     let mut output_raw: Vec<f32> = vec![0.0; img_raw.len()];
 
-
+    
     let mut inbuf: halide_buffer_t = halide_buffer(width as i32, height as i32, channels as i32, halide_type_t{bits: 32,code: 2,lanes: 1}, input.as_mut_ptr(), 1);
     let mut outbuf:halide_buffer_t = halide_buffer(width as i32, height as i32, channels as i32, halide_type_t{bits: 32,code: 2,lanes: 1}, output_raw.as_mut_ptr(), 0);
 
     unsafe {
-        //iir_blur(&mut inbuf, 0.1, &mut outbuf);
+        iir_blur(&mut inbuf, 0.1, &mut outbuf);
     }
 
     //save
@@ -108,4 +108,3 @@ fn halide_buffer(
 
     buf
 }
-
